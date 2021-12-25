@@ -2,11 +2,9 @@
 hej
 
 """
-import pyaudio
-import sys
-import numpy as np
-import wave
-import struct
+
+from audioplayer import AudioPlayer
+import eyed3
 
 
 class Book:
@@ -26,39 +24,20 @@ class Book:
 
 def main():
     File = "Test_data/Robert_Jordan/Wheel_of_Time/[01]_The_Eye_of_the_World/The_Eye_of_the_World-Robert_Jordan.mp3"
-    start = 12
-    length = 7
-    chunk = 1024
 
-    spf = wave.open(File, 'rb')
-    signal = spf.readframes(-1)
-    signal = np.fromstring(signal, 'Int16')
-    p = pyaudio.PyAudio()
+    tag = eyeD3.Tag()
+    tag.link(File)
+    print
+    tag.getArtist()
+    print
+    tag.getAlbum()
+    print
+    tag.getTitle()
 
-    stream = p.open(format=
-                    p.get_format_from_width(spf.getsampwidth()),
-                    channels=spf.getnchannels(),
-                    rate=spf.getframerate(),
-                    output=True)
+    if eyeD3.isMp3File(File):
+         audioFile = eyeD3.Mp3AudioFile(File)
+         tag = audioFile.getTag()
 
-    pos = spf.getframerate() * length
-
-    signal = signal[start * spf.getframerate():(start * spf.getframerate()) + pos]
-
-    sig = signal[1:chunk]
-
-    inc = 0
-    data = 0
-
-    # play
-    while data != '':
-        data = struct.pack("%dh" % (len(sig)), *list(sig))
-        stream.write(data)
-        inc = inc + chunk
-        sig = signal[inc:inc + chunk]
-
-    stream.close()
-    p.terminate()
 
 
 if __name__ == "__main__":
