@@ -2,11 +2,13 @@
 
 """
 import os
+
 from tinytag import TinyTag
+from plex import get_data
 
 
 class Book:
-    def __init__(self, title, author, series, length, isbn, narator, genres, release_date,
+    def __init__(self, title, author, release_date, series, length, isbn, narator, genres,
                  publisher, summary, rating, last_position, chapters, bitrate, filesize):
         self.Title = title
         self.Author = author
@@ -24,30 +26,43 @@ class Book:
         self.Bitrate = bitrate
         self.Filesize = filesize
 
-    def init_book_from_filepath(self, file_path):
-        meta = TinyTag.get(file_path)
-        self.Title = meta.title
-        self.Author = meta.albumartist
-        self.Series = meta.album
-        self.Length = meta.duration
-        self.Narator = meta.composer
-        self.Genres = meta.genre
-        self.Release_date = meta.year
-        self.Bitrate = meta.bitrate
-        self.Filesize = meta.filesize
-        return self
-
     def as_dict(self):
         return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
 
 
 class Library:
     def __init__(self):
-        print("ska fixas")
+        self.Books = []
+
+    def remove_book(self, book):
+        self.Books.remove(book)
+
+    def add_book(self, book):
+        self.Books.append(book)
+
+    def sort_by_title(self):
+        pass
+
+    def sort_by_author(self):
+        pass
+
+    def sort_by_release_date(self):
+        pass
+
+
+def _sort(library):
+    pass
+
+
+def init_book_from_filepath(file_path):
+    meta = TinyTag.get(file_path)
+    return Book(meta.title, meta.albumartist, meta.year, meta.album, meta.duration, None, meta.composer, meta.genre,
+                None, meta.extra, None, None, None, meta.bitrate, meta.filesize)
 
 
 def list_files_in_library(library_path):
     files = []
+    library = Library(None)
 
     # TODO add all different file types
     for r, d, f in os.walk(library_path):
@@ -55,37 +70,14 @@ def list_files_in_library(library_path):
             if '.mp3' in file or '.m4b' in file or '.m4a' in file:
                 file_path = os.path.join(r, file)
                 files.append(file_path)
-                book = Book.init_book_from_filepath(file_path)
-                print(book)
+                book = init_book_from_filepath(file_path)
+                library.add_book(book)
 
-
-# def metadata(file):
-#     meta = TinyTag.get(file)
-#
-#     b = Book(title=meta.title,
-#              author=meta.artist,
-#              series=meta.album,
-#              length=meta.duration,
-#              isbn=None,
-#              narator=meta.composer,
-#              genres=meta.genre,
-#              release_date=meta.year,
-#              publisher=None,
-#              summary=None,
-#              rating=None,
-#              last_position=None,
-#              chapters=meta.track_total,
-#              bitrate=meta.bitrate,
-#              filesize=meta.filesize)
-#
-#     print(b.as_dict())
+    print(library.Books)
 
 
 def main():
-    # library_path = "Library/"
-    library_path = "/home/oliver/Documents/Projekt/Audiobook-player/Library/"
-
-    list_files_in_library(library_path)
+    get_data.get()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
 Test_data/
 .idea/
 build/
+
+plex_config.py
