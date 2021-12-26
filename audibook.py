@@ -2,20 +2,21 @@
 
 """
 import os
+import time
 
 from tinytag import TinyTag
 from plex import get_data
 
 
 class Book:
-    def __init__(self, title, author, release_date, series, length, isbn, narator, genres,
-                 publisher, summary, rating, last_position, chapters, bitrate, filesize):
+    def __init__(self, title, author, release_date, series, length, isbn, narrator, genres,
+                 publisher, summary, rating, last_position, chapters, bitrate, filesize, plex_key):
         self.Title = title
         self.Author = author
         self.Series = series
         self.Length = length
         self.ISBN = isbn
-        self.Narator = narator
+        self.Narrator = narrator
         self.Genres = genres
         self.Release_date = release_date
         self.Publisher = publisher
@@ -25,6 +26,7 @@ class Book:
         self.Chapters = chapters
         self.Bitrate = bitrate
         self.Filesize = filesize
+        self.Plex_key = plex_key
 
     def as_dict(self):
         return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
@@ -50,8 +52,19 @@ class Library:
         pass
 
 
-def _sort(library):
-    pass
+lib = Library()
+
+
+def parse_plex_library(plex_lib):
+
+    for dict in plex_lib:
+        for key, val in dict.items():
+            print(key)
+
+        print("--------")
+        time.sleep(1)
+
+
 
 
 def init_book_from_filepath(file_path):
@@ -77,7 +90,8 @@ def list_files_in_library(library_path):
 
 
 def main():
-    get_data.get()
+    plex_lib_dict = get_data.get_metadata()
+    parse_plex_library(plex_lib_dict)
 
 
 if __name__ == "__main__":

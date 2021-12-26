@@ -1,38 +1,22 @@
-
-from plexapi import myplex
 from plexapi.server import PlexServer
+from plex import config
 
-from plexapi.myplex import MyPlexAccount
-from plexapi.sync import AUDIO_BITRATE_320_KBPS
-
-import plex_config
+plex = PlexServer(config.PLEX_URL, config.PLEX_TOKEN)
 
 
-# Get server instance from login info
-def _plex_server_login():
-    client = myplex.MyPlexAccount(plex_config.USERNAME, plex_config.PASSWORD)
-    server = client.resource(plex_config.SERVER).connect()
-    return server
-
-
-def token_login():
-    plex = PlexServer(plex_config.baseurl, plex_config.token)
-
-    return plex
-
-
+# TODO add option for multiple different library names
 # Get all books from plex server
-def get():
-    server = token_login()
-    plex_lib = server.library.section('Audiobooks')
-    print("logged in to plex")
+def get_metadata():
+    plex_audi_section = plex.library.section('Audiobooks')
+    books = []
 
-    lib_dict = {"key": "Title"}
-    amount_of_albums = 0
-    for author in plex_lib.all():
-        amount_of_albums += len(author.albums())
+    for author in plex_audi_section.all():
         for b in author.albums():
-            lib_dict[b.key] = b.title
+            books.append(b.__dict__)
+
+    return books
 
 
-    print("amount of books in library: ", amount_of_albums)
+if __name__ == '__main__':
+    lib = get_metadata()
+    print(lib)
