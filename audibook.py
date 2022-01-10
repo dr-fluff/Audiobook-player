@@ -10,7 +10,7 @@ from plex import get_data
 
 class Book:
     def __init__(self, title, author, release_date, series, length, isbn, narrator, genres,
-                 publisher, summary, rating, last_position, chapters, bitrate, filesize, plex_key):
+                 publisher, summary, rating, last_position, chapters, bitrate, filesize, plex_key, art=None):
         self.Title = title
         self.Author = author
         self.Series = series
@@ -27,6 +27,7 @@ class Book:
         self.Bitrate = bitrate
         self.Filesize = filesize
         self.Plex_key = plex_key
+        self.Art = art
 
     def as_dict(self):
         return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
@@ -55,16 +56,34 @@ class Library:
 lib = Library()
 
 
+def _find(dict, keyword):
+    for key, val in dict.items():
+        if keyword == key:
+            return val
+
+
 def parse_plex_library(plex_lib):
+    print("parse plex lib")
+    for plex_book_dict in plex_lib:
+        book = Book(title=_find(plex_book_dict['_data'], 'title'),
+                    author=_find(plex_book_dict['_data'], 'parentTitle'),
+                    release_date=_find(plex_book_dict['_data'], 'originallyAvailableAt'),
+                    series=_find(plex_book_dict['_data'], 'titleSort'),
+                    length=plex_book_dict['duration'],
+                    isbn=None,
+                    narrator=plex_book_dict['styles'],
+                    genres=plex_book_dict['genres'],
+                    publisher=plex_book_dict['studio'],
+                    summary=plex_book_dict['summary'],
+                    rating=_find(plex_book_dict['_data'], 'rating'),
+                    last_position=None,
+                    chapters=plex_book_dict['track'],
+                    bitrate=None,
+                    filesize=None,
+                    plex_key=plex_book_dict['key'],
+                    art=None)
 
-    for dict in plex_lib:
-        for key, val in dict.items():
-            print(key)
-
-        print("--------")
-        time.sleep(1)
-
-
+        lib.add_book(book)
 
 
 def init_book_from_filepath(file_path):

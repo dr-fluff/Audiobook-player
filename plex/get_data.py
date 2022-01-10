@@ -1,5 +1,9 @@
+import time
+import timeit
+
 from plexapi.server import PlexServer
 from plex import config
+#import config
 
 plex = PlexServer(config.PLEX_URL, config.PLEX_TOKEN)
 
@@ -11,12 +15,24 @@ def get_metadata():
     books = []
 
     for author in plex_audi_section.all():
-        for b in author.albums():
-            books.append(b.__dict__)
+        for book in author.albums():
+
+            dict = book.__dict__
+            tracks = {}
+            duration = 0
+            for i, t in enumerate(book.tracks()):
+                tracks[i] = t.title
+                duration += t.duration
+
+            dict['track'] = tracks
+            dict['duration'] = duration
+            books.append(dict)
+
+    stop = timeit.default_timer()
 
     return books
 
 
-if __name__ == '__main__':
-    lib = get_metadata()
-    print(lib)
+def play():
+    pass
+
